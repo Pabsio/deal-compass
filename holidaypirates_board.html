@@ -70,6 +70,10 @@ td{padding:10px 14px;font-size:13px;color:var(--text);vertical-align:middle}
 .src-other{background:#f0f0f0;color:#888}
 
 .market-cell{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.market-opt{display:flex;align-items:center;gap:8px;padding:6px 14px;cursor:pointer;font-size:13px;font-weight:600;transition:background .1s}
+.market-opt:hover{background:var(--purple-soft)}
+.market-opt input{accent-color:var(--purple);width:14px;height:14px;cursor:pointer}
+.market-opt.excluded{color:var(--muted);text-decoration:line-through}
 .mflag{font-size:16px;line-height:1}
 .mcode{font-size:11px;font-weight:700;color:var(--muted)}
 .deal-date{font-size:12px;color:var(--muted)}
@@ -169,9 +173,23 @@ td{padding:10px 14px;font-size:13px;color:var(--text);vertical-align:middle}
           <option value="booking">Booking</option>
         </select>
       </div>
-      <div class="fg">
+      <div class="fg" style="position:relative">
         <label>Market</label>
-        <select id="f-market"><option value="">All markets</option></select>
+        <div id="market-dropdown" onclick="toggleMarketDropdown(event)" style="
+          font-family:inherit;font-size:13px;font-weight:600;
+          padding:7px 28px 7px 12px;border-radius:20px;
+          border:1.5px solid var(--border);background:#fff;
+          color:var(--text);cursor:pointer;min-width:130px;
+          background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23a685a0'/%3E%3C/svg%3E");
+          background-repeat:no-repeat;background-position:right 10px center;
+          user-select:none;white-space:nowrap">All markets</div>
+        <div id="market-panel" style="
+          display:none;position:absolute;top:100%;left:0;z-index:50;
+          background:#fff;border:1.5px solid var(--border);border-radius:12px;
+          padding:8px 0;min-width:180px;box-shadow:0 4px 20px rgba(106,52,96,.12);
+          margin-top:4px;max-height:280px;overflow-y:auto">
+          <div id="market-options"></div>
+        </div>
       </div>
       <div class="fg">
         <label>Published</label>
@@ -271,11 +289,38 @@ function init(){
   var mkts=[...new Set(
     DEALS.filter(d=>ALLOWED_SOURCES.has(d.source)).map(d=>mkt(d).code)
   )].sort();
-  var fMkt=document.getElementById('f-market');
+  var excludedMarkets=new Set();
+  var mktPanel=document.getElementById('market-options');
   mkts.forEach(m=>{
     var deal=DEALS.find(d=>mkt(d).code===m&&ALLOWED_SOURCES.has(d.source));
     var mk=deal?mkt(deal):{code:m,flag:'🌍'};
-    var o=document.createElement('option');o.value=m;o.textContent=mk.flag+' '+m;fMkt.appendChild(o);
+    var div=document.createElement('div');
+    div.className='market-opt';
+    div.id='mopt-'+m;
+    div.innerHTML='<input type="checkbox" id="mchk-'+m+'" value="'+m+'"> <span>'+mk.flag+' '+m+'</span>';
+    div.querySelector('input').addEventListener('change',function(){
+      if(this.checked){excludedMarkets.add(m);div.classList.add('excluded');}
+      else{excludedMarkets.delete(m);div.classList.remove('excluded');}
+      updateMarketLabel();render();
+    });
+    mktPanel.appendChild(div);
+  });
+
+  function updateMarketLabel(){
+    var el=document.getElementById('market-dropdown');
+    if(excludedMarkets.size===0) el.textContent='All markets';
+    else if(excludedMarkets.size===1) el.textContent='Excl. '+[...excludedMarkets][0];
+    else el.textContent='Excl. '+excludedMarkets.size+' markets';
+    // Actualizar chips
+  }
+
+  function toggleMarketDropdown(e){
+    e.stopPropagation();
+    var p=document.getElementById('market-panel');
+    p.style.display=p.style.display==='none'?'block':'none';
+  }
+  document.addEventListener('click',function(){
+    document.getElementById('market-panel').style.display='none';
   });
 
   var total=DEALS.filter(d=>ALLOWED_SOURCES.has(d.source)).length;
@@ -294,15 +339,15 @@ function init(){
 function render(){
   var search=document.getElementById('f-search').value.trim().toLowerCase();
   var source=document.getElementById('f-source').value;
-  var market=document.getElementById('f-market').value;
+  var market=''; // no usado, se usa excludedMarkets
   var days=+document.getElementById('f-days').value||0;
   var cutoff=days?new Date(Date.now()-days*864e5):null;
-  var hasFilter=search||source||market||days;
+  var hasFilter=search||source||(excludedMarkets&&excludedMarkets.size>0)||days;
   document.getElementById('clear-btn').classList.toggle('hidden',!hasFilter);
 
   var chips='';
   if(source)chips+='<span class="chip">'+esc(srcLabel(source))+'</span>';
-  if(market){var d0=DEALS.find(d=>mkt(d).code===market);chips+='<span class="chip">'+(d0?mkt(d0).flag+' ':'')+esc(market)+'</span>';}
+  if(excludedMarkets&&excludedMarkets.size>0){excludedMarkets.forEach(m=>{var d0=DEALS.find(d=>mkt(d).code===m);chips+='<span class="chip" style="text-decoration:line-through;opacity:.6">\'+(d0?mkt(d0).flag+' ':'')+esc(m)+'</span>';});}
   if(days)chips+='<span class="chip">Last '+days+'d</span>';
   if(search)chips+='<span class="chip">🔍 '+esc(search)+'</span>';
   document.getElementById('chips').innerHTML=chips;
@@ -310,7 +355,7 @@ function render(){
   _filtered=DEALS.filter(d=>{
     if(!ALLOWED_SOURCES.has(d.source))return false;
     if(source&&d.source!==source)return false;
-    if(market&&mkt(d).code!==market)return false;
+    if(excludedMarkets&&excludedMarkets.has(mkt(d).code))return false;
     if(cutoff&&d.published_date){try{if(new Date(d.published_date)<cutoff)return false;}catch(e){}}
     if(search){var h=(cleanTitle(d.title)+' '+(d.description||'')).toLowerCase();if(!h.includes(search))return false;}
     return true;
@@ -352,7 +397,13 @@ function renderRows(rows){
 
 function showAll(){renderRows(_filtered);document.getElementById('more-wrap').style.display='none';}
 function setSort(col){if(sortKey===col)sortDir*=-1;else{sortKey=col;sortDir=1;}['title','source','market','date'].forEach(c=>{var si=document.getElementById('si-'+c);if(si)si.innerHTML=c===sortKey?(sortDir===1?'↑':'↓'):'↕';});render();}
-function clearFilters(){['f-search','f-source','f-market','f-days'].forEach(id=>document.getElementById(id).value='');render();}
+function clearFilters(){
+  ['f-search','f-source','f-days'].forEach(id=>document.getElementById(id).value='');
+  excludedMarkets.clear();
+  document.querySelectorAll('#market-options input').forEach(cb=>{cb.checked=false;cb.closest('.market-opt').classList.remove('excluded');});
+  updateMarketLabel();
+  render();
+}
 
 function openPanel(idx){
   var d=_filtered[idx];if(!d)return;
