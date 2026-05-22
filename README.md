@@ -55,3 +55,4 @@ python build_board.py
 | `holidaypirates_board.html` | Board generado (actualizado por CI) |
 | `netlify.toml` | Configuración de Netlify |
 | `.github/workflows/scrape.yml` | GitHub Actions workflow |
+# Deal Compass
