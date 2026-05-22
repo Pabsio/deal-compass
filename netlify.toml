@@ -1,0 +1,13 @@
+[build]
+  publish = "."           # sirve desde la raíz del repo
+  command = "echo 'no build needed'"
+
+[[redirects]]
+  from = "/"
+  to   = "/holidaypirates_board.html"
+  status = 200
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=300"   # 5 min de cache
