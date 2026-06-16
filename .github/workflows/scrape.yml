@@ -2,13 +2,7 @@ name: Scrape & Deploy
 
 on:
   schedule:
-    # Cada 3 horas entre 08:00 y 23:00 CET (07:00-22:00 UTC)
-    - cron: '0 7 * * *'   # 08:00 CET
-    - cron: '0 10 * * *'  # 11:00 CET
-    - cron: '0 13 * * *'  # 14:00 CET
-    - cron: '0 16 * * *'  # 17:00 CET
-    - cron: '0 19 * * *'  # 20:00 CET
-    - cron: '0 22 * * *'  # 23:00 CET
+    - cron: "0 7 * * 1-5"
   workflow_dispatch:       # también permite lanzarlo manualmente desde GitHub
 
 jobs:
