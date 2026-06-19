@@ -7,15 +7,15 @@ Uso: python build_board.py
 import argparse, json, re, sqlite3, webbrowser
 from pathlib import Path
 
-HERE     = Path(__file__).parent
-TEMPLATE = HERE / "board_template.html"
-DB_DEFAULT = HERE / "holidaypirates_deals.db"
-OUTPUT   = HERE / "holidaypirates_board.html"
+HERE      = Path(__file__).parent
+TEMPLATE  = HERE / "board_template.html"
+DB_DEFAULT= HERE / "holidaypirates_deals.db"
+OUTPUT    = HERE / "holidaypirates_board.html"
 
 def load_deals(db_path):
     conn = sqlite3.connect(db_path)
     cols = [r[1] for r in conn.execute("PRAGMA table_info(deals)")]
-    rows = conn.execute("SELECT * FROM deals ORDER BY published_date DESC, id DESC").fetchall()
+    rows = conn.execute("SELECT * FROM deals ORDER BY published_date DESC, scraped_at DESC, id DESC").fetchall()
     conn.close()
     deals = []
     for r in rows:
@@ -33,6 +33,7 @@ def load_deals(db_path):
 def build_board(deals):
     html = TEMPLATE.read_text(encoding="utf-8")
     deals_json = json.dumps(deals, ensure_ascii=False, default=str)
+    # Reemplazar solo la línea exacta con los datos
     lines = html.split("\n")
     result = "\n".join([
         f"const DEALS = {deals_json};"
