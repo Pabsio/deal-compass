@@ -362,17 +362,18 @@ function render(){
 
 function renderRows(rows){
   var tbody=document.getElementById('tbody');
-  if(!rows.length){tbody.innerHTML='<tr class="empty-row"><td colspan="6">No deals match your filters</td></tr>';return;}
+  if(!rows.length){tbody.innerHTML='<tr class="empty-row"><td colspan="4">No deals match your filters</td></tr>';return;}
   tbody.innerHTML=rows.map((d,i)=>{
     var title=cleanTitle(d.title)||'—';
-    var price=d.price_per_person||'';
+    var mk=mkt(d);
+    var thumb=d.image_url&&d.image_url.startsWith('http')
+      ?'<img class="deal-thumb" src="'+esc(d.image_url)+'" alt="" loading="lazy">'
+      :'';
     return '<tr onclick="openPanel('+i+')">'
-      +'<td><div class="deal-title">'+esc(title)+'</div></td>'
+      +'<td><div class="deal-cell">'+thumb+'<div><div class="deal-title">'+esc(title)+'</div>'+(d.description?'<div class="deal-desc">'+esc(d.description)+'</div>':'')+'</div></div></td>'
       +'<td><span class="src-badge '+srcClass(d.source)+'">'+esc(srcLabel(d.source))+'</span></td>'
-      +'<td><span class="deal-site">'+esc(d.site_name||'—')+'</span></td>'
+      +'<td><div class="market-cell"><span class="mflag">'+mk.flag+'</span><span class="mcode">'+esc(mk.code)+'</span></div></td>'
       +'<td><span class="deal-date">'+fmtDate(d.published_date)+'</span></td>'
-      +'<td class="r">'+(price?'<span class="price-val">'+esc(price)+'</span>':'<span class="price-empty">—</span>')+'</td>'
-      +'<td class="r cta-link" onclick="event.stopPropagation()">'+(d.cta_href?'<a href="'+esc(d.cta_href)+'" target="_blank" rel="noopener">Book ↗</a>':'<span style="color:var(--muted);font-size:12px">—</span>')+'</td>'
       +'</tr>';
   }).join('');
 }
@@ -485,6 +486,9 @@ function handleAuth() {
   showApp();
 }
 
+document.addEventListener('error', e => {
+  if(e.target.classList&&e.target.classList.contains('deal-thumb')) e.target.classList.add('broken');
+}, true);
 handleAuth();
 </script>
 
