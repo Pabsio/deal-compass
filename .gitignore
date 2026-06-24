@@ -1,10 +1,5 @@
-# DB local (se mantiene via cache en CI, no se sube al repo)
-holidaypirates_deals.db
-
-# Python
+.DS_Store
+*.csv
+*.json
 __pycache__/
 *.pyc
-.env
-
-# Output CSV local
-output/

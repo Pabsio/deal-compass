@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hotel Deals · HolidayPirates Group</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --purple:      #6A3460;
+  --purple-soft: #f0e8ef;
+  --purple-mid:  #a685a0;
+  --border:      #e4dce4;
+  --bg:          #faf9f8;
+  --surface:     #ffffff;
+  --text:        #333333;
+  --muted:       #a685a0;
+  --trivago-bg:  #fff7e6;
+  --trivago:     #7a5500;
+  --airbnb-bg:   #fff0f0;
+  --airbnb:      #9a2020;
+  --booking-bg:  #e8f0ff;
+  --booking:     #1a3a8a;
+  --other-bg:    #f0f0f0;
+  --other:       #555555;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* ── Header ── */
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:.85rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;position:sticky;top:0;z-index:100}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-logo{width:28px;height:28px}
+.brand-name{font-size:18px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.brand-name span{color:var(--purple)}
+.brand-sub{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-left:2px}
+.header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.stat-pill{display:flex;flex-direction:column;align-items:center}
+.stat-lbl{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.stat-val{font-size:17px;font-weight:800;color:var(--purple);line-height:1.1}
+.stat-sep{width:1px;height:32px;background:var(--border)}
+.last-upd{font-size:11px;color:var(--muted)}
+
+/* ── Page ── */
+.page{padding:1.2rem 2rem 3rem;max-width:1440px;margin:0 auto}
+
+/* ── Filters ── */
+.sec{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.1rem 1.5rem;margin-bottom:.9rem;box-shadow:0 1px 4px rgba(106,52,96,.06)}
+.filters-grid{display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-end}
+.fg{display:flex;flex-direction:column;gap:4px;min-width:110px}
+.fg label{font-size:10px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.09em}
+.fg select,.fg input[type=text]{font-family:'Open Sans',sans-serif;font-size:13px;font-weight:600;padding:7px 28px 7px 12px;border-radius:20px;border:1.5px solid var(--border);background:#fff;color:var(--text);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23a685a0'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;outline:none;transition:border-color .15s}
+.fg select:focus,.fg input:focus{border-color:var(--purple)}
+.fg input[type=text]{background-image:none;padding-right:12px}
+.filter-actions{margin-left:auto;display:flex;align-items:flex-end}
+.clear-btn{font-family:inherit;font-size:13px;font-weight:700;padding:7px 18px;border-radius:20px;border:1.5px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+.clear-btn:hover{border-color:var(--purple);color:var(--purple)}
+.clear-btn.hidden{visibility:hidden;pointer-events:none}
+
+/* ── Results bar ── */
+.res-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:8px}
+.res-left{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.chips-row{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--purple-soft);border-radius:20px;font-size:11px;font-weight:700;padding:3px 10px;color:var(--purple)}
+
+/* ── Table ── */
+.tbl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(106,52,96,.06)}
+table{width:100%;border-collapse:collapse}
+thead th{font-size:10px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.09em;padding:11px 14px;text-align:left;border-bottom:1.5px solid var(--border);background:#faf5fa;white-space:nowrap;cursor:pointer;user-select:none}
+thead th:hover{color:#55285a}
+thead th.r{text-align:right}
+thead th .si{margin-left:3px;opacity:.35;font-style:normal}
+thead th.on .si{opacity:1}
+tbody tr{border-bottom:1px solid #ede5ed;transition:background .1s;cursor:pointer}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#faf5fa}
+td{padding:11px 14px;font-size:13px;color:var(--text);vertical-align:middle}
+td.r{text-align:right}
+.empty-row td{text-align:center;padding:3rem;color:#ccc;font-size:14px;cursor:default}
+
+/* ── Source badge ── */
+.src-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;white-space:nowrap;text-transform:uppercase;letter-spacing:.04em}
+.src-trivago{background:var(--trivago-bg);color:var(--trivago)}
+.src-airbnb{background:var(--airbnb-bg);color:var(--airbnb)}
+.src-booking{background:var(--booking-bg);color:var(--booking)}
+.src-other{background:var(--other-bg);color:var(--other)}
+
+/* ── Title cell ── */
+.deal-title{font-size:13px;font-weight:600;line-height:1.4;max-width:320px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.deal-site{font-size:11px;color:var(--muted);margin-top:2px}
+.deal-date{font-size:12px;color:var(--muted)}
+
+/* ── Price ── */
+.price-val{font-size:16px;font-weight:800;color:var(--purple);white-space:nowrap}
+.price-empty{font-size:12px;color:var(--muted)}
+
+/* ── CTA link ── */
+.cta-link a{font-size:12px;color:var(--purple);text-decoration:none;font-weight:700;padding:5px 13px;border:1.5px solid var(--border);border-radius:20px;transition:all .12s;display:inline-block;white-space:nowrap}
+.cta-link a:hover{background:var(--purple);color:#fff;border-color:var(--purple)}
+
+/* ── Detail panel ── */
+.overlay{position:fixed;inset:0;background:rgba(51,30,48,0.45);z-index:200;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(3px)}
+.overlay.open{opacity:1;pointer-events:all}
+.panel{position:fixed;top:0;right:0;bottom:0;width:460px;max-width:100vw;background:var(--surface);border-left:1px solid var(--border);z-index:201;transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);overflow-y:auto;display:flex;flex-direction:column}
+.panel.open{transform:translateX(0)}
+.panel-head{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;position:sticky;top:0;background:var(--surface);z-index:1}
+.panel-title{font-size:17px;font-weight:800;line-height:1.35;color:var(--text)}
+.panel-close{background:none;border:1.5px solid var(--border);color:var(--muted);width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.panel-close:hover{border-color:var(--purple);color:var(--purple)}
+.panel-body{padding:20px 24px;flex:1}
+.panel-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.meta-item{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px}
+.meta-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:700;margin-bottom:3px}
+.meta-val{font-size:14px;font-weight:700;color:var(--text)}
+.meta-val.big{font-size:20px;color:var(--purple)}
+.panel-desc{font-size:13px;color:#555;line-height:1.65;margin-bottom:20px;padding:14px;background:var(--bg);border-left:3px solid var(--purple-mid);border-radius:0 8px 8px 0}
+.panel-actions{display:flex;flex-direction:column;gap:8px}
+.btn-primary{display:block;text-align:center;padding:13px;background:var(--purple);color:#fff;font-family:inherit;font-size:14px;font-weight:700;border-radius:24px;text-decoration:none;transition:opacity .15s}
+.btn-primary:hover{opacity:.88}
+.btn-secondary{display:block;text-align:center;padding:12px;background:#fff;color:var(--purple);font-family:inherit;font-size:13px;font-weight:700;border-radius:24px;text-decoration:none;border:1.5px solid var(--border);transition:all .15s}
+.btn-secondary:hover{border-color:var(--purple)}
+
+/* ── More btn ── */
+.more-wrap{text-align:center;padding:1rem}
+.more-btn{font-family:inherit;font-size:13px;font-weight:700;padding:9px 24px;border-radius:20px;border:1.5px solid var(--border);background:#fff;color:var(--purple);cursor:pointer;transition:all .15s}
+.more-btn:hover{background:var(--purple);color:#fff;border-color:var(--purple)}
+
+@media(max-width:700px){.page,.header{padding-left:1rem;padding-right:1rem}.filters-grid{flex-direction:column}.panel{width:100vw}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="brand">
+    <!-- Ruby SVG simplified -->
+    <svg class="brand-logo" viewBox="0 0 40 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 0C9 0 0 9 0 20c0 14 20 28 20 28S40 34 40 20C40 9 31 0 20 0z" fill="#6A3460"/>
+      <ellipse cx="20" cy="20" rx="10" ry="10" fill="#fff" opacity=".15"/>
+      <circle cx="23" cy="16" r="3" fill="#fff"/>
+      <!-- parrot simplified -->
+      <path d="M14 14 Q20 8 26 12 Q24 18 20 20 Q16 18 14 14z" fill="#E84040"/>
+      <path d="M26 12 Q32 10 30 16 Q28 18 26 16z" fill="#7ac3dd"/>
+      <path d="M20 20 Q22 24 20 28 Q18 24 20 20z" fill="#E84040"/>
+      <circle cx="24" cy="15" r="1.5" fill="#333"/>
+    </svg>
+    <div>
+      <div class="brand-name">Holiday<span>Pirates</span></div>
+      <div class="brand-sub">Hotel Deals Board</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="stat-pill"><span class="stat-lbl">Deals</span><span class="stat-val" id="st-total">—</span></div>
+    <div class="stat-sep"></div>
+    <div class="stat-pill"><span class="stat-lbl">Sites</span><span class="stat-val" id="st-sites">—</span></div>
+    <div class="stat-sep"></div>
+    <div class="stat-pill"><span class="stat-lbl">Sources</span><span class="stat-val" id="st-sources">—</span></div>
+    <div class="last-upd" id="last-upd"></div>
+  </div>
+</div>
+
+<div class="page">
+  <!-- Filters -->
+  <div class="sec">
+    <div class="filters-grid">
+      <div class="fg">
+        <label>Search</label>
+        <input type="text" id="f-search" placeholder="Title or destination…" style="min-width:200px">
+      </div>
+      <div class="fg">
+        <label>Source</label>
+        <select id="f-source"><option value="">All sources</option></select>
+      </div>
+      <div class="fg">
+        <label>Site</label>
+        <select id="f-site"><option value="">All sites</option></select>
+      </div>
+      <div class="fg">
+        <label>Published</label>
+        <select id="f-days">
+          <option value="">Any time</option>
+          <option value="1">Last 24h</option>
+          <option value="7">Last 7 days</option>
+          <option value="30">Last 30 days</option>
+          <option value="90">Last 90 days</option>
+        </select>
+      </div>
+      <div class="filter-actions">
+        <button class="clear-btn hidden" id="clear-btn" onclick="clearFilters()">Clear filters</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results bar -->
+  <div class="res-bar">
+    <div class="res-left">
+      <div class="stat-pill"><span class="stat-lbl">Showing</span><span class="stat-val" id="st-showing">—</span></div>
+      <div class="stat-sep"></div>
+      <div class="chips-row" id="chips"></div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th onclick="setSort('title')">Title <i class="si" id="si-title">↕</i></th>
+          <th onclick="setSort('source')">Source <i class="si" id="si-source">↕</i></th>
+          <th onclick="setSort('site')">Site <i class="si" id="si-site">↕</i></th>
+          <th onclick="setSort('date')">Published <i class="si" id="si-date">↕</i></th>
+          <th class="r" onclick="setSort('price')">Price <i class="si" id="si-price">↕</i></th>
+          <th class="r">Book</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="more-wrap" id="more-wrap" style="display:none">
+      <button class="more-btn" id="more-btn" onclick="showAll()"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Detail panel -->
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+<div class="panel" id="panel">
+  <div class="panel-head">
+    <div class="panel-title" id="p-title"></div>
+    <button class="panel-close" onclick="closePanel()">✕</button>
+  </div>
+  <div class="panel-body">
+    <div class="panel-meta" id="p-meta"></div>
+    <div class="panel-desc" id="p-desc" style="display:none"></div>
+    <div class="panel-actions" id="p-actions"></div>
+  </div>
+</div>
+
+<script>
+const DEALS = [];
+
+// ── Helpers ──
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmtDate(s){if(!s)return'—';var p=(s||'').split('T')[0].split('-');if(p.length<3)return s;var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return p[2]+' '+mo[parseInt(p[1])-1]+' '+p[0];}
+function cleanTitle(t){return(t||'').replace(/\n/g,' — ').trim();}
+function srcClass(s){var m={trivago:'trivago',airbnb:'airbnb',booking:'booking'};return'src-'+(m[s]||'other');}
+function srcLabel(s){return(s||'other').charAt(0).toUpperCase()+(s||'other').slice(1);}
+
+// ── State ──
+var sortKey='date', sortDir=-1;
+var _filtered=[];
+
+// ── Init ──
+function init(){
+  // Fill filters
+  var sources=[...new Set(DEALS.map(d=>d.source).filter(Boolean))].sort();
+  var sites=[...new Set(DEALS.map(d=>d.site_name).filter(Boolean))].sort();
+  var fSrc=document.getElementById('f-source');
+  var fSite=document.getElementById('f-site');
+  sources.forEach(s=>{var o=document.createElement('option');o.value=s;o.textContent=srcLabel(s);fSrc.appendChild(o);});
+  sites.forEach(s=>{var o=document.createElement('option');o.value=s;o.textContent=s;fSite.appendChild(o);});
+
+  // Stats header
+  document.getElementById('st-total').textContent=DEALS.length;
+  document.getElementById('st-sites').textContent=new Set(DEALS.map(d=>d.site_name)).size;
+  document.getElementById('st-sources').textContent=sources.length;
+  var latest=DEALS.map(d=>d.scraped_at).filter(Boolean).sort().pop();
+  if(latest)document.getElementById('last-upd').textContent='Updated '+fmtDate(latest.slice(0,10));
+
+  // Events
+  ['f-search','f-source','f-site','f-days'].forEach(id=>{
+    document.getElementById(id).addEventListener('input',render);
+    document.getElementById(id).addEventListener('change',render);
+  });
+
+  render();
+}
+
+function getFilters(){
+  return{
+    search:document.getElementById('f-search').value.trim().toLowerCase(),
+    source:document.getElementById('f-source').value,
+    site:document.getElementById('f-site').value,
+    days:+document.getElementById('f-days').value||0,
+  };
+}
+
+function render(){
+  var f=getFilters();
+  var cutoff=f.days?new Date(Date.now()-f.days*864e5):null;
+  var hasFilter=f.search||f.source||f.site||f.days;
+  document.getElementById('clear-btn').classList.toggle('hidden',!hasFilter);
+
+  // Chips
+  var chips='';
+  if(f.source)chips+='<span class="chip">'+esc(srcLabel(f.source))+'</span>';
+  if(f.site)chips+='<span class="chip">'+esc(f.site.replace(/\s*\(.*\)/,''))+'</span>';
+  if(f.days)chips+='<span class="chip">Last '+f.days+'d</span>';
+  if(f.search)chips+='<span class="chip">🔍 '+esc(f.search)+'</span>';
+  document.getElementById('chips').innerHTML=chips;
+
+  // Filter
+  _filtered=DEALS.filter(d=>{
+    if(f.source&&d.source!==f.source)return false;
+    if(f.site&&d.site_name!==f.site)return false;
+    if(cutoff&&d.published_date){try{if(new Date(d.published_date)<cutoff)return false;}catch(e){}}
+    if(f.search){var hay=(cleanTitle(d.title)+' '+(d.description||'')+' '+(d.site_name||'')).toLowerCase();if(!hay.includes(f.search))return false;}
+    return true;
+  });
+
+  // Sort
+  _filtered.sort((a,b)=>{
+    var av,bv;
+    if(sortKey==='title'){av=cleanTitle(a.title);bv=cleanTitle(b.title);}
+    else if(sortKey==='source'){av=a.source||'';bv=b.source||'';}
+    else if(sortKey==='site'){av=a.site_name||'';bv=b.site_name||'';}
+    else if(sortKey==='date'){av=a.published_date||'';bv=b.published_date||'';}
+    else if(sortKey==='price'){av=a.price_per_person||'zzz';bv=b.price_per_person||'zzz';}
+    else{av=a.published_date||'';bv=b.published_date||'';}
+    return av<bv?-sortDir:av>bv?sortDir:0;
+  });
+
+  document.getElementById('st-showing').textContent=_filtered.length;
+  renderRows(_filtered.slice(0,200));
+  var mw=document.getElementById('more-wrap');
+  var mb=document.getElementById('more-btn');
+  if(_filtered.length>200){mw.style.display='block';mb.textContent='Show all '+_filtered.length+' deals';}
+  else mw.style.display='none';
+}
+
+function renderRows(rows){
+  var tbody=document.getElementById('tbody');
+  if(!rows.length){tbody.innerHTML='<tr class="empty-row"><td colspan="6">No deals match your filters</td></tr>';return;}
+  tbody.innerHTML=rows.map((d,i)=>{
+    var title=cleanTitle(d.title)||'—';
+    var price=d.price_per_person||'';
+    return '<tr onclick="openPanel('+i+')">'
+      +'<td><div class="deal-title">'+esc(title)+'</div></td>'
+      +'<td><span class="src-badge '+srcClass(d.source)+'">'+esc(srcLabel(d.source))+'</span></td>'
+      +'<td><span class="deal-site">'+esc(d.site_name||'—')+'</span></td>'
+      +'<td><span class="deal-date">'+fmtDate(d.published_date)+'</span></td>'
+      +'<td class="r">'+(price?'<span class="price-val">'+esc(price)+'</span>':'<span class="price-empty">—</span>')+'</td>'
+      +'<td class="r cta-link" onclick="event.stopPropagation()">'+(d.cta_href?'<a href="'+esc(d.cta_href)+'" target="_blank" rel="noopener">Book ↗</a>':'<span style="color:var(--muted);font-size:12px">—</span>')+'</td>'
+      +'</tr>';
+  }).join('');
+}
+
+function showAll(){renderRows(_filtered);document.getElementById('more-wrap').style.display='none';}
+
+function setSort(col){
+  if(sortKey===col)sortDir*=-1;else{sortKey=col;sortDir=1;}
+  ['title','source','site','date','price'].forEach(c=>{var si=document.getElementById('si-'+c);if(si)si.innerHTML=c===sortKey?(sortDir===1?'↑':'↓'):'↕';});
+  render();
+}
+
+function clearFilters(){
+  document.getElementById('f-search').value='';
+  document.getElementById('f-source').value='';
+  document.getElementById('f-site').value='';
+  document.getElementById('f-days').value='';
+  render();
+}
+
+// ── Panel ──
+function openPanel(idx){
+  var d=_filtered[idx];
+  if(!d)return;
+  document.getElementById('p-title').textContent=cleanTitle(d.title)||'Deal';
+  document.getElementById('p-meta').innerHTML=
+    '<div class="meta-item"><div class="meta-lbl">Source</div><div class="meta-val"><span class="src-badge '+srcClass(d.source)+'">'+esc(srcLabel(d.source))+'</span></div></div>'
+    +'<div class="meta-item"><div class="meta-lbl">Price p.p.</div><div class="meta-val big">'+esc(d.price_per_person||'—')+'</div></div>'
+    +'<div class="meta-item"><div class="meta-lbl">Published</div><div class="meta-val">'+fmtDate(d.published_date)+'</div></div>'
+    +'<div class="meta-item"><div class="meta-lbl">Site</div><div class="meta-val">'+esc(d.site_name||'—')+'</div></div>';
+  var desc=document.getElementById('p-desc');
+  if(d.description){desc.textContent=d.description;desc.style.display='block';}else desc.style.display='none';
+  document.getElementById('p-actions').innerHTML=
+    (d.cta_href?'<a class="btn-primary" href="'+esc(d.cta_href)+'" target="_blank" rel="noopener">→ Book on '+esc(srcLabel(d.source))+'</a>':'')
+    +(d.url?'<a class="btn-secondary" href="'+esc(d.url)+'" target="_blank" rel="noopener">View original post</a>':'');
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('panel').classList.add('open');
+}
+function closePanel(){document.getElementById('overlay').classList.remove('open');document.getElementById('panel').classList.remove('open');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel();});
+
+init();
+</script>
+</body>
+</html>
