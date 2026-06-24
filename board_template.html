@@ -89,6 +89,8 @@ td.r{text-align:right}
 .deal-cell{display:flex;align-items:center;gap:10px}
 .deal-thumb{width:64px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0}
 .deal-thumb.broken{display:none}
+.book-btn{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:#fff;color:var(--purple);font-size:15px;font-weight:700;cursor:pointer;transition:all .15s}
+.book-btn:hover{background:var(--purple);color:#fff;border-color:var(--purple)}
 .deal-title{font-size:13px;font-weight:600;line-height:1.4;max-width:320px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .deal-site{font-size:11px;color:var(--muted);margin-top:2px}
 .deal-date{font-size:12px;color:var(--muted)}
@@ -245,7 +247,6 @@ td.r{text-align:right}
           <th onclick="setSort('source')">Source <i class="si" id="si-source">↕</i></th>
           <th onclick="setSort('site')">Site <i class="si" id="si-site">↕</i></th>
           <th onclick="setSort('date')">Published <i class="si" id="si-date">↕</i></th>
-          <th class="r" onclick="setSort('price')">Price <i class="si" id="si-price">↕</i></th>
           <th class="r">Book</th>
         </tr>
       </thead>
@@ -351,7 +352,6 @@ function render(){
     else if(sortKey==='source'){av=a.source||'';bv=b.source||'';}
     else if(sortKey==='site'){av=a.site_name||'';bv=b.site_name||'';}
     else if(sortKey==='date'){av=a.published_date||'';bv=b.published_date||'';}
-    else if(sortKey==='price'){av=a.price_per_person||'zzz';bv=b.price_per_person||'zzz';}
     else{av=a.published_date||'';bv=b.published_date||'';}
     return av<bv?-sortDir:av>bv?sortDir:0;
   });
@@ -378,6 +378,7 @@ function renderRows(rows){
       +'<td><span class="src-badge '+srcClass(d.source)+'">'+esc(srcLabel(d.source))+'</span></td>'
       +'<td><div class="market-cell"><span class="mflag">'+mk.flag+'</span><span class="mcode">'+esc(mk.code)+'</span></div></td>'
       +'<td><span class="deal-date">'+fmtDate(d.published_date)+'</span></td>'
+      +'<td class="r"><button class="book-btn" title="Ver oferta" onclick="event.stopPropagation();openPanel('+i+')">✓</button></td>'
       +'</tr>';
   }).join('');
 }
@@ -386,7 +387,7 @@ function showAll(){renderRows(_filtered);document.getElementById('more-wrap').st
 
 function setSort(col){
   if(sortKey===col)sortDir*=-1;else{sortKey=col;sortDir=1;}
-  ['title','source','site','date','price'].forEach(c=>{var si=document.getElementById('si-'+c);if(si)si.innerHTML=c===sortKey?(sortDir===1?'↑':'↓'):'↕';});
+  ['title','source','site','date'].forEach(c=>{var si=document.getElementById('si-'+c);if(si)si.innerHTML=c===sortKey?(sortDir===1?'↑':'↓'):'↕';});
   render();
 }
 
@@ -405,7 +406,6 @@ function openPanel(idx){
   document.getElementById('p-title').textContent=cleanTitle(d.title)||'Deal';
   document.getElementById('p-meta').innerHTML=
     '<div class="meta-item"><div class="meta-lbl">Source</div><div class="meta-val"><span class="src-badge '+srcClass(d.source)+'">'+esc(srcLabel(d.source))+'</span></div></div>'
-    +'<div class="meta-item"><div class="meta-lbl">Price p.p.</div><div class="meta-val big">'+esc(d.price_per_person||'—')+'</div></div>'
     +'<div class="meta-item"><div class="meta-lbl">Published</div><div class="meta-val">'+fmtDate(d.published_date)+'</div></div>'
     +'<div class="meta-item"><div class="meta-lbl">Site</div><div class="meta-val">'+esc(d.site_name||'—')+'</div></div>';
   var desc=document.getElementById('p-desc');
