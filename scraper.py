@@ -119,12 +119,16 @@ RSS_HEADERS = {
     "Accept": "application/rss+xml, application/xml, text/xml, */*",
 }
 
-ALLOWED_SOURCES = {"trivago", "airbnb", "booking"}
+ALLOWED_SOURCES = {"trivago", "airbnb", "booking", "holidu", "vio"}
 
 PLATFORM_MAP = {
     "airbnb":   ["airbnb.com", "airbnb.", "7eer.net/c/462462"],
     "trivago":  ["trivago."],
     "booking":  ["booking.com"],
+    "holidu":   ["holidu."],
+    # VIO siempre enlaza a hotels.urlaubspiraten.de sin importar el país;
+    # el mercado se deduce del site_name (sitio HP de origen), no del CTA.
+    "vio":      ["hotels.urlaubspiraten.de"],
     "expedia":  ["expedia."],
     "logitravel": ["logitravel."],
     "travelcircus": ["travelcircus."],
@@ -318,7 +322,8 @@ async def get_cta(page, url: str) -> str:
     cta_href = await page.evaluate(r"""() => {
         const PLATFORMS = [
             'trivago.', 'airbnb.com', 'airbnb.', '7eer.net',
-            'booking.com', 'expedia.', 'logitravel.', 'travelcircus.'
+            'booking.com', 'holidu.', 'hotels.urlaubspiraten.de',
+            'expedia.', 'logitravel.', 'travelcircus.'
         ];
 
         // 1. Botón CTA principal por clase estable del grupo

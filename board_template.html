@@ -21,6 +21,10 @@
   --airbnb:      #9a2020;
   --booking-bg:  #e8f0ff;
   --booking:     #1a3a8a;
+  --holidu-bg:   #e6f7f6;
+  --holidu:      #0d7a72;
+  --vio-bg:      #ede9fb;
+  --vio:         #5b34b3;
   --other-bg:    #f0f0f0;
   --other:       #555555;
 }
@@ -83,6 +87,8 @@ td.r{text-align:right}
 .src-trivago{background:var(--trivago-bg);color:var(--trivago)}
 .src-airbnb{background:var(--airbnb-bg);color:var(--airbnb)}
 .src-booking{background:var(--booking-bg);color:var(--booking)}
+.src-holidu{background:var(--holidu-bg);color:var(--holidu)}
+.src-vio{background:var(--vio-bg);color:var(--vio)}
 .src-other{background:var(--other-bg);color:var(--other)}
 
 /* ── Title cell ── */
@@ -279,7 +285,7 @@ const DEALS = [];
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function fmtDate(s){if(!s)return'—';var p=(s||'').split('T')[0].split('-');if(p.length<3)return s;var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return p[2]+' '+mo[parseInt(p[1])-1]+' '+p[0];}
 function cleanTitle(t){return(t||'').replace(/\n/g,' — ').trim();}
-function srcClass(s){var m={trivago:'trivago',airbnb:'airbnb',booking:'booking'};return'src-'+(m[s]||'other');}
+function srcClass(s){var m={trivago:'trivago',airbnb:'airbnb',booking:'booking',holidu:'holidu',vio:'vio'};return'src-'+(m[s]||'other');}
 function srcLabel(s){return(s||'other').charAt(0).toUpperCase()+(s||'other').slice(1);}
 function mkt(d){var m=(d.site_name||'').match(/\(([^)]+)\)/);var code=m?m[1].toUpperCase():'';var iso={UK:'GB'};var fc=iso[code]||code;var flag='';if(/^[A-Z]{2}$/.test(fc)){flag=String.fromCodePoint.apply(null,[].map.call(fc,function(c){return 0x1F1E6+c.charCodeAt(0)-65;}));}return{flag:flag||'🏳️',code:code||'—'};}
 

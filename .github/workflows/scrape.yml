@@ -32,7 +32,7 @@ jobs:
             deals-db-
 
       - name: Run scraper
-        run: python scraper.py --sources trivago airbnb booking
+        run: python scraper.py --sources trivago airbnb booking holidu vio
 
       - name: Build board
         run: python build_board.py --no-open
